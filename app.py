@@ -74,4 +74,4 @@ def details(movie_id):
     return render_template('details.html', movie=details, cast=cast, recs=recs, providers=providers, trailer=trailer, reviews=reviews, director=director, img_url=IMG_URL)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
