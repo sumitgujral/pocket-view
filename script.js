@@ -35,11 +35,7 @@ function setupEventListeners() {
             filterBtns.forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
             const filter = e.target.dataset.filter;
-            if (filter === 'all') {
-                loadRecommendedMovies('popular');
-            } else {
-                loadRecommendedMovies(filter);
-            }
+            loadRecommendedMovies(filter);
         });
     });
 }
@@ -162,10 +158,11 @@ function createMovieCard(movie) {
     return card;
 }
 
-// Show movie details (basic implementation)
+// Show movie details in console (can be expanded to modal later)
 function showMovieDetails(movie) {
     const overview = movie.overview || 'No overview available.';
-    alert(`${movie.title}\n\n${overview}\n\nRating: ${movie.vote_average}/10`);
+    console.log(`Movie: ${movie.title}\nOverview: ${overview}\nRating: ${movie.vote_average}/10`);
+    // Future enhancement: Implement a modal dialog for better UX
 }
 
 // Show loading state
