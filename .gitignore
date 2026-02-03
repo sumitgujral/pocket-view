@@ -1,0 +1,24 @@
+# Environment variables
+.env
+.env.local
+
+# API Keys (if stored in separate file)
+config.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies (if added later)
+node_modules/
