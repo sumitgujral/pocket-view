@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<a href="/" class="inline-block mb-6 px-4 py-2 rounded-lg border border-gold/50 text-gold hover:bg-gold hover:text-white transition text-sm">
+    ← Back to Home
+</a>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <div class="lg:col-span-3 flex flex-col gap-4">
+        <div class="rounded-xl overflow-hidden shadow-2xl border-2 border-gold/20 relative group">
+            {% if movie.poster_path %}
+                <img src="{{ img_url }}{{ movie.poster_path }}" class="w-full object-cover">
+            {% else %}
+                <img src="https://via.placeholder.com/300x450" class="w-full">
+            {% endif %}
+            
+            {% if trailer %}
+            <div x-data="{ open: false }">
+                <div @click="open = true" class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition cursor-pointer">
+                    <div class="w-16 h-16 bg-gold/90 rounded-full flex items-center justify-center pl-1 shadow-lg hover:scale-110 transition">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                </div>
+
+                <div x-show="open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4" style="display: none;">
+                    <div @click.away="open = false" class="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gold/30">
+                        <button @click="open = false" class="absolute top-4 right-4 text-white hover:text-gold text-2xl z-10">✕</button>
+                        <template x-if="open">
+                          <iframe class="w-full h-full" src="https://www.youtube.com/embed/{{ trailer.key }}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="flex flex-wrap gap-2 justify-center">
+            <span class="px-3 py-1 rounded-full border border-gold/40 text-xs text-gold bg-gold/10">
+                {{ movie.runtime }} min
+            </span>
+            <span class="px-3 py-1 rounded-full border border-gold/40 text-xs text-gold bg-gold/10">
+                {{ movie.release_date[:4] }}
+            </span>
+            <span class="px-3 py-1 rounded-full bg-gold text-black font-bold text-xs">
+                IMDb {{ movie.vote_average|round(1) }}
+            </span>
+        </div>
+    </div>
+
+    <div class="lg:col-span-6">
+        
+        <div class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-serif text-black opacity-80 dark:text-white text-gray-900 font-bold mb-2 leading-tight">
+                {{ movie.title }}
+            </h1>
+            <p class="text-gold text-lg mb-4">
+                {% for g in movie.genres %}{{ g.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+            </p>
+
+            <div class="flex flex-wrap gap-3 mb-6">
+                {% if movie.vote_average > 8.0 %}
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-600 to-yellow-400 rounded-lg text-black text-xs font-bold shadow-lg">
+                    <span>🏆</span> Fan Favorite
+                </div>
+                {% endif %}
+                
+                {% if movie.popularity > 100 %}
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg text-white text-xs font-bold shadow-lg">
+                    <span>🔥</span> Trending
+                </div>
+                {% endif %}
+
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-gold dark:border-white/20 rounded-lg text-xs opacity-80">
+                    <span>🎬</span> Critics Choice Nominee
+                </div>
+            </div>
+        </div>
+
+        <div x-data="{ tab: 'overview' }" class="bg-lightsec dark:bg-white/5 backdrop-blur-md rounded-2xl border border-gold/20 overflow-hidden shadow-xl min-h-[400px]">
+            
+            <div class="flex border-b border-gold/20">
+                <button @click="tab = 'overview'" :class="{ 'bg-gold text-black font-bold': tab === 'overview', 'hover:bg-white/10': tab !== 'overview' }" class="flex-1 py-4 text-sm uppercase tracking-wider transition">Overview</button>
+                <button @click="tab = 'cast'" :class="{ 'bg-gold text-black font-bold': tab === 'cast', 'hover:bg-white/10': tab !== 'cast' }" class="flex-1 py-4 text-sm uppercase tracking-wider transition">Cast</button>
+                <button @click="tab = 'watch'" :class="{ 'bg-gold text-black font-bold': tab === 'watch', 'hover:bg-white/10': tab !== 'watch' }" class="flex-1 py-4 text-sm uppercase tracking-wider transition">Watch</button>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <div x-show="tab === 'overview'" x-transition.opacity>
+                    <div class="flex flex-wrap gap-8 mb-8 border-b border-white/10 pb-6">
+                        <div>
+                            <span class="block text-gold text-xs font-bold uppercase tracking-widest mb-1">Director</span>
+                            <span class="text-lg opacity-80">{{ director }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-gold text-xs font-bold uppercase tracking-widest mb-1">Status</span>
+                            <span class="text-lg opacity-80">{{ movie.status }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-gold text-xs font-bold uppercase tracking-widest mb-1">Release Date</span>
+                            <span class="text-lg opacity-80">{{ movie.release_date }}</span>
+                        </div>
+                    </div>
+
+                    <h3 class="font-bold text-xl mb-4 text-gold">Storyline</h3>
+                    <p class="leading-7 opacity-90 text-lg font-light">{{ movie.overview }}</p>
+                    {% if movie.tagline %}
+                    <p class="mt-6 italic text-gold opacity-80 border-l-2 border-gold pl-4">"{{ movie.tagline }}"</p>
+                    {% endif %}
+                </div>
+
+                <div x-show="tab === 'cast'" x-transition.opacity style="display: none;">
+                    <div class="grid grid-cols-3 gap-6 text-center">
+                        {% for actor in cast %}
+                        <div class="flex flex-col items-center group">
+                            <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-gold/50 mb-3 shadow-lg p-1 group-hover:border-gold transition">
+                                {% if actor.profile_path %}
+                                    <img src="{{ img_url }}{{ actor.profile_path }}" class="w-full h-full rounded-full object-cover">
+                                {% else %}
+                                    <div class="w-full h-full bg-gray-700 rounded-full"></div>
+                                {% endif %}
+                            </div>
+                            <h4 class="font-bold text-sm leading-tight">{{ actor.name }}</h4>
+                            <p class="text-xs opacity-60 mt-1">{{ actor.character }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div x-show="tab === 'watch'" x-transition.opacity style="display: none;">
+                    <h3 class="font-bold text-xl mb-6">Streaming Now</h3>
+                    {% if providers %}
+                        <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                            {% for p in providers %}
+                            <a href="{{ get_direct_link(p.provider_name, movie.title) }}" target="_blank" class="group flex flex-col items-center gap-2">
+                                <img src="https://image.tmdb.org/t/p/original{{ p.logo_path }}" class="w-16 h-16 rounded-2xl border border-white/10 shadow-lg group-hover:scale-110 group-hover:border-gold transition duration-300">
+                                <span class="text-xs font-bold opacity-70 group-hover:text-gold">{{ p.provider_name }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-10 border-2 border-dashed border-gray-600 rounded-xl">
+                            <p class="opacity-70 mb-4">No direct streaming options found.</p>
+                            <a href="https://www.google.com/search?q=watch+{{ quote(movie.title) }}+online" target="_blank" class="inline-block px-6 py-2 bg-gold text-black font-bold rounded-full hover:bg-white transition">
+                                Search Google
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <h3 class="font-bold text-xl mb-4 text-gold border-b border-white/10 pb-2">Top Reviews</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% if reviews %}
+                    {% for review in reviews %}
+                    <div class="bg-lightsec dark:bg-white/5 p-5 rounded-xl border border-white/5 hover:border-gold/30 transition">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-yellow-600 flex items-center justify-center font-bold text-black text-xs">
+                                {{ review.author[0]|upper }}
+                            </div>
+                            <span class="font-bold text-sm">{{ review.author }}</span>
+                            {% if review.author_details.rating %}
+                            <span class="text-gold text-xs bg-gold/10 px-2 py-0.5 rounded">★ {{ review.author_details.rating }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-xs opacity-70 italic line-clamp-4 leading-relaxed">"{{ review.content }}"</p>
+                        <a href="{{ review.url }}" target="_blank" class="text-[10px] text-gold mt-2 block hover:underline">Read full review →</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-sm opacity-50 col-span-full">No reviews available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="lg:col-span-3">
+        <div class="bg-lightsec dark:bg-white/5 rounded-2xl p-4 border border-gold/20 shadow-xl">
+            <h3 class="font-serif text-xl text-gold mb-6 border-b border-gray-700 pb-2">Recommended</h3>
+            <div class="space-y-4">
+                {% for rec in recs %}
+                <div class="relative group overflow-hidden rounded-xl aspect-video">
+                    <img src="{{ img_url }}{{ rec.backdrop_path if rec.backdrop_path else rec.poster_path }}" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-end p-3">
+                        <h4 class="text-white font-bold text-sm leading-tight drop-shadow-md">{{ rec.title }}</h4>
+                        <a href="/movie/{{ rec.id }}" class="mt-2 text-[10px] uppercase tracking-wider text-gold hover:text-white flex items-center gap-1">
+                            View Movie →
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

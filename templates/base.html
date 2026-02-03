@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="black" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>'>
+    <title>Pocket View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#d4af37',
+                        'gold-light': '#f3e5ab',
+                        darkbg: '#0f2027',
+                        darksec: '#203a43',
+                        lightbg: '#fdfbf7',
+                        lightsec: '#f3f0e6'
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        .dark body { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); background-attachment: fixed; }
+        body { background: linear-gradient(to bottom, #fdfbf7, #e6e6e6); background-attachment: fixed; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-gray-900 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <nav class="p-4 md:p-6 flex flex-wrap justify-between items-center max-w-7xl mx-auto w-full z-20 gap-4">
+        <a href="/" class="flex items-center gap-2 group shrink-0">
+            <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span class="text-2xl font-serif text-gold font-bold tracking-wide hidden sm:block">Pocket View</span>
+        </a>
+
+        {% if request.path != '/' %}
+        <form action="/" method="get" class="flex-grow max-w-md mx-auto relative group">
+            <input 
+                type="text" 
+                name="query" 
+                placeholder="Search movies..." 
+                class="w-full px-5 py-3 rounded-full bg-white/50 dark:bg-black/20 border border-gold/30 focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition text-sm"
+            >
+            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gold hover:scale-110 transition pr-2">
+                🔍
+            </button>
+        </form>
+        {% else %}
+        <div class="flex-grow"></div>
+        {% endif %}
+        
+        <button onclick="toggleTheme()" class="shrink-0 p-2 rounded-full border border-gold/50 bg-white/10 hover:bg-gold/20 transition text-lg">
+            <span id="theme-icon">🌙</span>
+        </button>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full p-6 z-10">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-center p-8 text-sm opacity-60 border-t border-gold/20 mt-10 font-serif">
+        Develop by © Suresh © 2026
+    </footer>
+
+    <script>
+        const html = document.querySelector('html');
+        const icon = document.getElementById('theme-icon');
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            icon.innerText = '☀️';
+        } else {
+            html.classList.remove('dark');
+            icon.innerText = '🌙';
+        }
+
+        function toggleTheme() {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+                icon.innerText = '🌙';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+                icon.innerText = '☀️';
+            }
+        }
+    </script>
+</body>
+</html>

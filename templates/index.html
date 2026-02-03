@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh] md:min-h-[50vh] text-center space-y-8">
+    
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif text-gold/90 leading-tight">
+        Discover, track, and explore <br> your favorite films.
+    </h1>
+
+    <form action="/" method="get" class="w-full max-w-2xl relative group">
+        <input 
+            type="text" 
+            name="query" 
+            placeholder="Search for a movie..." 
+            class="w-full px-8 py-5 rounded-full text-lg bg-lightsec/80 dark:bg-black/30 backdrop-blur-md border-2 border-gold/60 focus:border-gold focus:ring-4 focus:ring-gold/20 focus:outline-none shadow-lg transition-all placeholder-gray-500 dark:placeholder-gray-400"
+        >
+        <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-gold hover:scale-110 transition">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </button>
+    </form>
+</div>
+
+<div class="mt-10">
+    <h2 class="text-3xl font-serif text-gold mb-8">{{ title }}</h2>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+        {% for movie in results %}
+        <a href="/movie/{{ movie.id }}" class="group relative flex flex-col items-center">
+            <div class="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border-2 border-transparent group-hover:border-gold transition-all duration-300 shadow-xl">
+                {% if movie.poster_path %}
+                    <img src="{{ img_url }}{{ movie.poster_path }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                {% else %}
+                    <div class="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">No Image</div>
+                {% endif %}
+                
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span class="text-gold font-bold">⭐ {{ (movie.vote_average or 0)|round(1) }}</span>
+                    <span class="text-white text-xs opacity-80">{{ (movie.release_date or '????')[:4] }}</span>
+                </div>
+            </div>
+            
+            <h3 class="mt-3 text-center text-sm font-bold opacity-80 group-hover:text-gold transition-colors line-clamp-1">
+                {{ movie.title }}
+            </h3>
+        </a>
+        {% else %}
+        <div class="col-span-full text-center py-20 opacity-50">
+            <p>No results found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
